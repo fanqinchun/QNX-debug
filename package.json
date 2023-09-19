@@ -139,13 +139,26 @@
 				"configurationAttributes": {
 					"launch": {
 						"required": [
-							"target",
+							"executable",
+							"targetFIlePath",
+							"remotePort",
 							"cwd"
 						],
 						"properties": {
-							"target": {
+							"executable": {
 								"type": "string",
-								"description": "Path of executable"
+								"description": "Path of executable",
+								"default": "./build/application.elf"
+							},
+							"targetFIlePath": {
+								"type": "string",
+								"description": "Path of executable in target board",
+								"default": "/tmp/application.elf"
+							},
+							"remotePort": {
+								"type": "string",
+								"description": "TCP/IP add that used to connect to host from target board.",
+								"default": "192.168.158.11:65000"
 							},
 							"arguments": {
 								"type": "string",

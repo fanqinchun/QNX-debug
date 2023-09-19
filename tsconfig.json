@@ -7,7 +7,7 @@
 			"es6"
 		],
 		"sourceMap": true,
-		"rootDir": ".",
+		"rootDir": "src",
 		"plugins": [
 			{
 				"name": "tslint-language-service"

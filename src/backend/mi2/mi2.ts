@@ -256,6 +256,32 @@ export class MI2 extends EventEmitter implements IBackend {
 		});
 	}
 
+	connectToQnx(cwd: string, executable: string, targetFIlePath: string, remotePort: string, autorun: string[]): Thenable<any> {
+		return new Promise((resolve, reject) => {
+			let args = [];
+			if (executable && !path.isAbsolute(executable))
+				executable = path.join(cwd, executable);
+			args = this.preargs.concat(this.extraargs || []);
+			/**/
+			/* if (executable)
+				args = args.concat([executable]); */
+			this.process = ChildProcess.spawn(this.application, args, { cwd: cwd, env: this.procEnv });
+			this.process.stdout.on("data", this.stdout.bind(this));
+			this.process.stderr.on("data", this.stderr.bind(this));
+			this.process.on("exit", (() => { this.emit("quit"); }).bind(this));
+			this.process.on("error", ((err) => { this.emit("launcherror", err); }).bind(this));
+			const promises = this.initCommands(executable, cwd, true);
+			promises.push(this.sendCommand("target-select qnx " + remotePort));
+			promises.push(...autorun.map(value => { return this.sendUserInput(value); }));
+			Promise.all(promises).then(() => {
+				Promise.all([this.sendCommand("upload " + executable + " " + targetFIlePath)]).then(() => {
+						this.emit("debug-ready");
+						resolve(undefined);
+					}, reject)
+			}, reject);
+		});
+	}
+
 	connect(cwd: string, executable: string, target: string, autorun: string[]): Thenable<any> {
 		return new Promise((resolve, reject) => {
 			let args = [];
@@ -444,8 +470,9 @@ export class MI2 extends EventEmitter implements IBackend {
 
 	start(runToStart: boolean): Thenable<boolean> {
 		const options: string[] = [];
-		if (runToStart)
-			options.push("--start");
+		/* this command doesn't support for QNX debugger. */
+		/* if (runToStart)
+			options.push("--start"); */
 		const startCommand: string = ["exec-run"].concat(options).join(" ");
 		return new Promise((resolve, reject) => {
 			this.log("console", "Running executable");

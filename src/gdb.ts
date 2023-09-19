@@ -6,7 +6,9 @@ import { SSHArguments, ValuesFormattingMode } from './backend/backend';
 
 export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	cwd: string;
-	target: string;
+	executable: string;
+	targetFIlePath: string;
+	remotePort: string;
 	gdbpath: string;
 	env: any;
 	debugger_args: string[];
@@ -79,16 +81,16 @@ class GDBDebugSession extends MI2DebugSession {
 				args.ssh.remotex11screen = 0;
 			this.isSSH = true;
 			this.setSourceFileMap(args.ssh.sourceFileMap, args.ssh.cwd, args.cwd);
-			this.miDebugger.ssh(args.ssh, args.ssh.cwd, args.target, args.arguments, args.terminal, false, args.autorun || []).then(() => {
+			this.miDebugger.ssh(args.ssh, args.ssh.cwd, args.executable, args.arguments, args.terminal, false, args.autorun || []).then(() => {
 				this.sendResponse(response);
 			}, err => {
 				this.sendErrorResponse(response, 105, `Failed to SSH: ${err.toString()}`);
 			});
 		} else {
-			this.miDebugger.load(args.cwd, args.target, args.arguments, args.terminal, args.autorun || []).then(() => {
+			this.miDebugger.connectToQnx(args.cwd, args.executable, args.targetFIlePath, args.remotePort, args.autorun || []).then(() => {
 				this.sendResponse(response);
 			}, err => {
-				this.sendErrorResponse(response, 103, `Failed to load MI Debugger: ${err.toString()}`);
+				this.sendErrorResponse(response, 102, `Failed to connect to MI debugger: ${err.toString()}`);
 			});
 		}
 	}

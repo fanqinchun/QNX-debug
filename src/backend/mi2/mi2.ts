@@ -270,11 +270,11 @@ export class MI2 extends EventEmitter implements IBackend {
 			this.process.stderr.on("data", this.stderr.bind(this));
 			this.process.on("exit", (() => { this.emit("quit"); }).bind(this));
 			this.process.on("error", ((err) => { this.emit("launcherror", err); }).bind(this));
-			const promises = this.initCommands(executable, cwd, true);
+			const promises = this.initCommands(executable, cwd);
 			promises.push(this.sendCommand("target-select qnx " + remotePort));
 			promises.push(...autorun.map(value => { return this.sendUserInput(value); }));
 			Promise.all(promises).then(() => {
-				Promise.all([this.sendCommand("upload " + executable + " " + targetFIlePath)]).then(() => {
+				Promise.all([this.sendCliCommand("upload " + executable + " " + targetFIlePath)]).then(() => {
 						this.emit("debug-ready");
 						resolve(undefined);
 					}, reject)
@@ -890,6 +890,7 @@ export class MI2 extends EventEmitter implements IBackend {
 				} else
 					resolve(node);
 			};
+
 			this.sendRaw(sel + "-" + command);
 		});
 	}

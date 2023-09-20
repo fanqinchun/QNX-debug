@@ -10,9 +10,9 @@
 			"args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
 			"sourceMaps": true,
 			"outFiles": [
+				"${workspaceRoot}/out/*.js",
 				"${workspaceRoot}/out/**/*.js"
 			],
-			"cwd": "${workspaceRoot}",
 			"preLaunchTask": "compile"
 		},
 		{

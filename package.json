@@ -16,9 +16,8 @@
 	"engines": {
 		"vscode": "^1.55.0"
 	},
-	"main": "./out/src/frontend/extension",
+	"main": "./out/frontend/extension",
 	"activationEvents": [
-		"onDebugResolve:qnx-debug",
 		"onCommand:code-debug.examineMemoryLocation",
 		"onCommand:code-debug.getFileNameNoExt",
 		"onCommand:code-debug.getFileBasenameNoExt"
@@ -107,7 +106,7 @@
 		"debuggers": [
 			{
 				"type": "qnx_gdb",
-				"program": "./out/src/gdb.js",
+				"program": "./out/gdb.js",
 				"runtime": "node",
 				"label": "QNX_GDB",
 				"languages": [
@@ -586,7 +585,7 @@
 			},
 			{
 				"type": "lldb-mi",
-				"program": "./out/src/lldb.js",
+				"program": "./out/lldb.js",
 				"runtime": "node",
 				"label": "LLDB",
 				"languages": [
@@ -927,7 +926,7 @@
 			},
 			{
 				"type": "mago-mi",
-				"program": "./out/src/mago.js",
+				"program": "./out/mago.js",
 				"runtime": "node",
 				"label": "Mago-MI",
 				"variables": {

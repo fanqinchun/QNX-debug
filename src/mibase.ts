@@ -36,7 +36,7 @@ export class MI2DebugSession extends DebugSession {
 	protected attached: boolean;
 	protected initialRunCommand: RunCommand;
 	protected stopAtEntry: boolean | string;
-	protected isSSH: boolean;
+	/* protected isSSH: boolean; */
 	protected sourceFileMap: SourceFileMap;
 	protected started: boolean;
 	protected crashed: boolean;
@@ -229,10 +229,10 @@ export class MI2DebugSession extends DebugSession {
 
 	protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
 		let path = args.source.path;
-		if (this.isSSH) {
+		/* if (this.isSSH) {
 			// convert local path to ssh path
 			path = this.sourceFileMap.toRemotePath(path);
-		}
+		} */
 		this.miDebugger.clearBreakPoints(path).then(() => {
 			const all = args.breakpoints.map(brk => {
 				return this.miDebugger.addBreakPoint({ file: path, line: brk.line, condition: brk.condition, countCondition: brk.hitCondition });
@@ -291,10 +291,11 @@ export class MI2DebugSession extends DebugSession {
 				let source = undefined;
 				let path = element.file;
 				if (path) {
-					if (this.isSSH) {
+					/* if (this.isSSH) {
 						// convert ssh path to local path
 						path = this.sourceFileMap.toLocalPath(path);
-					} else if (process.platform === "win32") {
+					} else */
+					if (process.platform === "win32") {
 						if (path.startsWith("\\cygdrive\\") || path.startsWith("/cygdrive/")) {
 							path = path[10] + ":" + path.substring(11); // replaces /cygdrive/c/foo/bar.txt with c:/foo/bar.txt
 						}
@@ -710,7 +711,8 @@ export class MI2DebugSession extends DebugSession {
 	}
 
 	protected gotoTargetsRequest(response: DebugProtocol.GotoTargetsResponse, args: DebugProtocol.GotoTargetsArguments): void {
-		const path: string = this.isSSH ? this.sourceFileMap.toRemotePath(args.source.path) : args.source.path;
+		/* const path: string = this.isSSH ? this.sourceFileMap.toRemotePath(args.source.path) : args.source.path; */
+		const path: string = args.source.path;
 		this.miDebugger.goto(path, args.line).then(done => {
 			response.body = {
 				targets: [{

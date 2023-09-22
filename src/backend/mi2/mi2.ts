@@ -226,32 +226,31 @@ export class MI2 extends EventEmitter implements IBackend {
 		return cmds;
 	}
 
-	attach(cwd: string, executable: string, target: string, autorun: string[]): Thenable<any> {
+	attach(cwd: string, executable: string, target: string, remotePort: string, shareLibPath: string, autorun: string[]): Thenable<any> {
 		return new Promise((resolve, reject) => {
 			let args = [];
+
 			if (executable && !path.isAbsolute(executable))
 				executable = path.join(cwd, executable);
+
 			args = this.preargs.concat(this.extraargs || []);
 			this.process = ChildProcess.spawn(this.application, args, { cwd: cwd, env: this.procEnv });
+
 			this.process.stdout.on("data", this.stdout.bind(this));
 			this.process.stderr.on("data", this.stderr.bind(this));
 			this.process.on("exit", (() => { this.emit("quit"); }).bind(this));
 			this.process.on("error", ((err) => { this.emit("launcherror", err); }).bind(this));
-			const promises = this.initCommands(target, cwd, true);
-			if (target.startsWith("extended-remote")) {
-				promises.push(this.sendCommand("target-select " + target));
-				if (executable)
-					promises.push(this.sendCommand("file-symbol-file \"" + escape(executable) + "\""));
-			} else {
-				// Attach to local process
-				if (executable)
-					promises.push(this.sendCommand("file-exec-and-symbols \"" + escape(executable) + "\""));
-				promises.push(this.sendCommand("target-attach " + target));
-			}
+
+			const promises = this.initCommands(executable, cwd);
+			promises.push(this.sendCommand("gdb-set solib-search-path " + shareLibPath));
+			promises.push(this.sendCommand("target-select qnx " + remotePort));
 			promises.push(...autorun.map(value => { return this.sendUserInput(value); }));
+
 			Promise.all(promises).then(() => {
-				this.emit("debug-ready");
-				resolve(undefined);
+				Promise.all([this.sendCommand("target-attach " + target)]).then(() => {
+					this.emit("debug-ready"),
+					resolve(undefined);},
+					reject);
 			}, reject);
 		});
 	}
@@ -259,20 +258,22 @@ export class MI2 extends EventEmitter implements IBackend {
 	connectToQnx(cwd: string, executable: string, targetFIlePath: string, remotePort: string, autorun: string[]): Thenable<any> {
 		return new Promise((resolve, reject) => {
 			let args = [];
+
 			if (executable && !path.isAbsolute(executable))
 				executable = path.join(cwd, executable);
+
 			args = this.preargs.concat(this.extraargs || []);
-			/**/
-			/* if (executable)
-				args = args.concat([executable]); */
 			this.process = ChildProcess.spawn(this.application, args, { cwd: cwd, env: this.procEnv });
+
 			this.process.stdout.on("data", this.stdout.bind(this));
 			this.process.stderr.on("data", this.stderr.bind(this));
 			this.process.on("exit", (() => { this.emit("quit"); }).bind(this));
 			this.process.on("error", ((err) => { this.emit("launcherror", err); }).bind(this));
+
 			const promises = this.initCommands(executable, cwd);
 			promises.push(this.sendCommand("target-select qnx " + remotePort));
 			promises.push(...autorun.map(value => { return this.sendUserInput(value); }));
+
 			Promise.all(promises).then(() => {
 				Promise.all([this.sendCliCommand("upload " + executable + " " + targetFIlePath)]).then(() => {
 						this.emit("debug-ready");

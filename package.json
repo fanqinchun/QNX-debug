@@ -86,7 +86,7 @@
 							},
 							"remotePort": {
 								"type": "string",
-								"description": "TCP/IP add that used to connect to host from target board.",
+								"description": "TCP/IP address that used to connect to host from target board.",
 								"default": "192.168.158.11:65000"
 							},
 							"arguments": {
@@ -161,6 +161,8 @@
 					"attach": {
 						"required": [
 							"target",
+							"executable",
+							"remotePort",
 							"cwd"
 						],
 						"properties": {
@@ -168,10 +170,20 @@
 								"type": "string",
 								"description": "PID of running program or program name or connection arguments (eg :2345) if remote is true"
 							},
-							"remote": {
-								"type": "boolean",
-								"description": "If true this will connect to a gdbserver instead of attaching to a PID",
-								"default": false
+							"executable": {
+								"type": "string",
+								"description": "Path of executable for debugging symbols",
+								"default": "./build/application.elf"
+							},
+							"remotePort": {
+								"type": "string",
+								"description": "TCP/IP address that used to connect to host from target board.",
+								"default": "192.168.158.11:65000"
+							},
+							"shareLibPath": {
+								"type": "string",
+								"description": "share library path in host that used to load symbols of debug file",
+								"default": "/home/username/qnx_version/target/qnx7/x86_64/lib"
 							},
 							"valuesFormatting": {
 								"type": "string",
@@ -192,10 +204,6 @@
 								"type": "boolean",
 								"description": "Prints all GDB responses to the console",
 								"default": false
-							},
-							"executable": {
-								"type": "string",
-								"description": "Path of executable for debugging symbols"
 							},
 							"gdbpath": {
 								"type": "string",
@@ -280,6 +288,8 @@
 							"request": "attach",
 							"name": "${2:Attach to PID}",
 							"target": "${1:[PID]}",
+							"executable": "${1:./build/application.elf",
+						    "remotePort": "192.168.158.11:65000",
 							"cwd": "^\"\\${workspaceRoot}\"",
 							"valuesFormatting": "parseText"
 						}

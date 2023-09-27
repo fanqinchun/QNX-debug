@@ -181,7 +181,8 @@
 								"default": "192.168.158.11:65000"
 							},
 							"shareLibPath": {
-								"type": "string",
+								"type": "array",
+								"item": "string",
 								"description": "share library path in host that used to load symbols of debug file",
 								"default": "/home/username/qnx_version/target/qnx7/x86_64/lib"
 							},

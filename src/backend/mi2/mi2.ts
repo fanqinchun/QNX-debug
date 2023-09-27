@@ -226,7 +226,7 @@ export class MI2 extends EventEmitter implements IBackend {
 		return cmds;
 	}
 
-	attach(cwd: string, executable: string, target: string, remotePort: string, shareLibPath: string, autorun: string[]): Thenable<any> {
+	attach(cwd: string, executable: string, target: string, remotePort: string, shareLibPath: string[], autorun: string[]): Thenable<any> {
 		return new Promise((resolve, reject) => {
 			let args = [];
 
@@ -242,7 +242,7 @@ export class MI2 extends EventEmitter implements IBackend {
 			this.process.on("error", ((err) => { this.emit("launcherror", err); }).bind(this));
 
 			const promises = this.initCommands(executable, cwd);
-			promises.push(this.sendCommand("gdb-set solib-search-path " + shareLibPath));
+			promises.push(this.sendCommand("gdb-set solib-search-path " + shareLibPath.join(" ")));
 			promises.push(this.sendCommand("target-select qnx " + remotePort));
 			promises.push(...autorun.map(value => { return this.sendUserInput(value); }));
 

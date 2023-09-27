@@ -27,7 +27,7 @@ export interface AttachRequestArguments extends DebugProtocol.AttachRequestArgum
 	target: string;
 	executable: string;
 	remotePort: string;
-	shareLibPath: string;
+	shareLibPath: string[];
 	gdbpath: string;
 	env: any;
 	debugger_args: string[];

@@ -247,7 +247,7 @@ export class MI2 extends EventEmitter implements IBackend {
 			promises.push(...autorun.map(value => { return this.sendUserInput(value); }));
 
 			Promise.all(promises).then(() => {
-				Promise.all([this.sendCommand("target-attach " + target)]).then(() => {
+				this.sendCommand("target-attach " + target).then(() => {
 					this.emit("debug-ready"),
 					resolve(undefined);},
 					reject);
@@ -275,7 +275,7 @@ export class MI2 extends EventEmitter implements IBackend {
 			promises.push(...autorun.map(value => { return this.sendUserInput(value); }));
 
 			Promise.all(promises).then(() => {
-				Promise.all([this.sendCliCommand("upload " + executable + " " + targetFIlePath)]).then(() => {
+				this.sendCliCommand("upload " + executable + " " + targetFIlePath).then(() => {
 						this.emit("debug-ready");
 						resolve(undefined);
 					}, reject)

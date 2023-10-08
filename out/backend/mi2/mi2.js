@@ -234,7 +234,7 @@ class MI2 extends events_1.EventEmitter {
         }
         return cmds;
     }
-    attach(cwd, executable, target, remotePort, autorun) {
+    attach(cwd, executable, target, remotePort, shareLibPath, autorun) {
         return new Promise((resolve, reject) => {
             let args = [];
             if (executable && !path.isAbsolute(executable))
@@ -246,11 +246,11 @@ class MI2 extends events_1.EventEmitter {
             this.process.on("exit", (() => { this.emit("quit"); }).bind(this));
             this.process.on("error", ((err) => { this.emit("launcherror", err); }).bind(this));
             const promises = this.initCommands(executable, cwd);
-            promises.push(this.sendCommand("gdb-set solib-search-path " + "/home/qinchunfan/qnx700_2/target/qnx7/x86_64/lib"));
+            promises.push(this.sendCommand("gdb-set solib-search-path " + shareLibPath.join(" ")));
             promises.push(this.sendCommand("target-select qnx " + remotePort));
             promises.push(...autorun.map(value => { return this.sendUserInput(value); }));
             Promise.all(promises).then(() => {
-                Promise.all([this.sendCommand("target-attach " + target)]).then(() => {
+                this.sendCommand("target-attach " + target).then(() => {
                     this.emit("debug-ready"),
                         resolve(undefined);
                 }, reject);
@@ -272,7 +272,7 @@ class MI2 extends events_1.EventEmitter {
             promises.push(this.sendCommand("target-select qnx " + remotePort));
             promises.push(...autorun.map(value => { return this.sendUserInput(value); }));
             Promise.all(promises).then(() => {
-                Promise.all([this.sendCliCommand("upload " + executable + " " + targetFIlePath)]).then(() => {
+                this.sendCliCommand("upload " + executable + " " + targetFIlePath).then(() => {
                     this.emit("debug-ready");
                     resolve(undefined);
                 }, reject);
